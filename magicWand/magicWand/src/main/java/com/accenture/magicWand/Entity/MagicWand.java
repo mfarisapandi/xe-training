@@ -1,12 +1,16 @@
 package com.accenture.magicWand.Entity;
 
+import lombok.*;
+
 import javax.persistence.*;
+import java.io.*;
 
 @Entity
 @Table(name = "magic_wand_catalogue")
-public class MagicWand {
+@Data
+public class MagicWand implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "magic_wand_id")
     private int magicWandID;
     @Column(name = "magic_wand_name")
