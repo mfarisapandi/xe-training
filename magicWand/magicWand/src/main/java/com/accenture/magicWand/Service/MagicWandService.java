@@ -24,14 +24,14 @@ public class MagicWandService {
 
     public MagicWand updateMagicWand(MagicWand magicWand){
         repository.findById(magicWand.getMagicWandID()).orElseThrow(
-                () -> new MagicWandException("Magic Wand with ID " + magicWand.getMagicWandID() + " does not exist")
+                () -> new MagicWandException(MagicWandException.ID_DOES_NOT_EXIST)
         );
         return repository.save(magicWand);
     }
 
     public void deleteMagicWand(int magicWandID){
         repository.findById(magicWandID).orElseThrow(
-                () -> new MagicWandException("Magic Wand wih ID " + magicWandID + " does not exist")
+                () -> new MagicWandException(MagicWandException.ID_DOES_NOT_EXIST)
         );
         repository.deleteById(magicWandID);
     }
