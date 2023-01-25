@@ -23,14 +23,14 @@ public class WizardServices {
 
     public Wizard updateWizard(Wizard wizard){
         repository.findById(wizard.getWizardID()).orElseThrow(
-                () -> new WizardException("Wizard with ID " + wizard.getWizardID() + " does not exist")
+                () -> new WizardException(WizardException.ID_DOES_NOT_EXIST)
         );
         return repository.save(wizard);
     }
 
     public void deleteWizard(int wizardID){
         repository.findById(wizardID).orElseThrow(
-                () -> new WizardException("Wizard with ID " + wizardID + " does not exist")
+                () -> new WizardException(WizardException.ID_DOES_NOT_EXIST)
         );
         repository.deleteById(wizardID);
     }
