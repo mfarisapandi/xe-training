@@ -34,7 +34,6 @@ public class OrderService {
             return "Error";
         }
     }
-
     public List<Order> getOrder() {
         LOGGER.info("Retrieving all orders from repository.");
         List<Order> orders = orderRepository.findAll();
@@ -43,7 +42,6 @@ public class OrderService {
         }
         return orders;
     }
-
     public Order addOrder(Order order) {
         LOGGER.info("Adding order to repository.");
         return orderRepository.save(order);
