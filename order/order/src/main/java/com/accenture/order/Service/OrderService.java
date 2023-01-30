@@ -3,7 +3,6 @@ package com.accenture.order.Service;
 import com.accenture.order.Entity.*;
 import com.accenture.order.Repository.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.http.*;
 import org.springframework.stereotype.*;
 import org.springframework.web.client.*;
 
@@ -36,16 +35,28 @@ public class OrderService {
         }
     }
 
-    public List<Order> getOrder(){
-        List<Order> order = orderRepository.findAll();
-        return order;
+    public List<Order> getOrder() {
+        LOGGER.info("Retrieving all orders from repository.");
+        List<Order> orders = orderRepository.findAll();
+        if (orders.isEmpty()) {
+            LOGGER.severe("No orders found");
+        }
+        return orders;
     }
 
-    public ResponseEntity<Order> addOrder(Order order){
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Order> request = new HttpEntity<>(order, headers);
-        ResponseEntity<Order> response = restTemplate.exchange("http://localhost:8090/api/xe/wizardList", HttpMethod.POST, request, Order.class);
-        return response;
+    public Order addOrder(Order order) {
+        LOGGER.info("Adding order to repository.");
+        return orderRepository.save(order);
     }
+
+    public Order updateOrder(Order order) {
+        LOGGER.info("Updating order in repository.");
+        return orderRepository.save(order);
+    }
+
+    public void deleteOrder(int orderID) {
+            LOGGER.info("Deleting order with ID: " + orderID + " from repository.");
+            orderRepository.deleteById(orderID);
+        }
+
 }

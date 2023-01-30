@@ -4,7 +4,6 @@ import com.accenture.order.Entity.*;
 import com.accenture.order.Repository.*;
 import com.accenture.order.Service.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -33,9 +32,20 @@ public class OrderController {
         return service.getOrder();
     }
 
-    @PutMapping("add")
-    public ResponseEntity<Order> addOrder(@RequestBody Order order){
+    @PostMapping("add")
+    public Order addOrder(@RequestBody Order order){
         return service.addOrder(order);
+    }
+
+    @PutMapping("update")
+    public Order updateOrder(@RequestBody Order order){
+        return service.updateOrder(order);
+    }
+
+    @DeleteMapping("delete/{orderID}")
+    public String deleteOrder(@PathVariable(value = "orderID") int orderID){
+        service.deleteOrder(orderID);
+        return ("Order with ID " + orderID + " is deleted");
     }
 
 
