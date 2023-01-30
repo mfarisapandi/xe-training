@@ -7,32 +7,57 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.logging.*;
 
 @Service
 public class WizardServices {
 
+    private static final Logger LOGGER = Logger.getLogger(WizardServices.class.getName());
     @Autowired
     WizardRepository repository;
+
     public List<Wizard> getWizards() {
-        return repository.findAll();
+        LOGGER.info("Retrieving all wizards from repository.");
+        List<Wizard> wizards = repository.findAll();
+        if (wizards.isEmpty()) {
+            LOGGER.severe("No Magic Wands found");
+        }
+        return wizards;
     }
 
     public Wizard addWizard (Wizard wizard){
+        try {
+            LOGGER.info("Adding wizard to repository");
+        } catch (WizardException e) {
+            LOGGER.severe("Error adding wizard to repository: " + wizard + " - " + e.getMessage());
+        }
         return repository.save(wizard);
     }
 
     public Wizard updateWizard(Wizard wizard){
-        repository.findById(wizard.getWizardID()).orElseThrow(
-                () -> new WizardException(WizardException.ID_DOES_NOT_EXIST)
-        );
+        try {
+            LOGGER.info("Updating wizard in repository.");
+            repository.findById(wizard.getWizardID()).orElseThrow(
+                    () -> new WizardException(WizardException.ID_DOES_NOT_EXIST)
+            );
+
+        } catch (WizardException e) {
+            LOGGER.severe("Error updating wizard in repository: " + e.getMessage());
+        }
         return repository.save(wizard);
     }
 
     public void deleteWizard(int wizardID){
-        repository.findById(wizardID).orElseThrow(
-                () -> new WizardException(WizardException.ID_DOES_NOT_EXIST)
-        );
-        repository.deleteById(wizardID);
+        try {
+            LOGGER.info("Deleting wizard with ID: " + wizardID + " from repository.");
+            repository.findById(wizardID).orElseThrow(
+                    () -> new WizardException(WizardException.ID_DOES_NOT_EXIST)
+            );
+            repository.deleteById(wizardID);
+        } catch (WizardException e) {
+            LOGGER.severe("Error deleting wizard with ID " + wizardID + ": " + e.getMessage());
+        }
     }
+
 
 }
