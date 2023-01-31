@@ -19,19 +19,19 @@ public class MagicWand implements Serializable {
     private String magicWandDesc;
     @Column(name = "age_limit")
     private int ageLimit;
-    @Column(name = "in_stock")
-    private String inStock;
+    @Column(name = "stock")
+    private int stock;
 
+    
     public MagicWand() {
     }
 
-    public MagicWand(int magicWandID, String magicWandName,
-                     String magicWandDesc, int ageLimit, String inStock) {
+    public MagicWand(int magicWandID, String magicWandName, String magicWandDesc, int ageLimit, int stock) {
         this.magicWandID = magicWandID;
         this.magicWandName = magicWandName;
         this.magicWandDesc = magicWandDesc;
         this.ageLimit = ageLimit;
-        this.inStock = inStock;
+        this.stock = stock;
     }
 
     public int getMagicWandID() {
@@ -66,11 +66,11 @@ public class MagicWand implements Serializable {
         this.ageLimit = ageLimit;
     }
 
-    public String getInStock() {
-        return inStock;
+    public int getStock() {
+        return stock;
     }
 
-    public void setInStock(String inStock) {
-        this.inStock = inStock;
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 }

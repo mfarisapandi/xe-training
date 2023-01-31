@@ -6,5 +6,4 @@ import org.springframework.stereotype.*;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
-    Order findByOrderID(Integer orderID);
 }

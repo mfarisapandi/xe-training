@@ -27,13 +27,13 @@ public class OrderController {
         return service.getList();
     }
 
-    @GetMapping("order")
+    @GetMapping("getOrder")
     public List<Order> getOrder(){
         return service.getOrder();
     }
 
     @PostMapping("add")
-    public Order addOrder(@RequestBody Order order){
+    public String addOrder(@RequestBody Order order){
         return service.addOrder(order);
     }
 
