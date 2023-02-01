@@ -25,7 +25,7 @@ public class WizardServices {
         return wizards;
     }
 
-    public Wizard addWizard (Wizard wizard){
+    public Wizard addWizard(Wizard wizard) {
         try {
             LOGGER.info("Adding wizard to repository");
         } catch (WizardException e) {
@@ -34,20 +34,18 @@ public class WizardServices {
         return repository.save(wizard);
     }
 
-    public Wizard updateWizard(Wizard wizard){
-        try {
-            LOGGER.info("Updating wizard in repository.");
-            repository.findById(wizard.getWizardID()).orElseThrow(
-                    () -> new WizardException(WizardException.ID_DOES_NOT_EXIST)
-            );
-
-        } catch (WizardException e) {
-            LOGGER.severe("Error updating wizard in repository: " + e.getMessage());
-        }
+    public Wizard updateWizard(Wizard wizard) {
+        LOGGER.info("Updating wizard in repository.");
+        repository.findById(wizard.getWizardID()).orElseThrow(
+                () -> {
+                    LOGGER.severe("Wizard with ID " + wizard.getWizardID() + " does not exist");
+                    return new WizardException(WizardException.ID_DOES_NOT_EXIST);
+                }
+        );
         return repository.save(wizard);
     }
 
-    public void deleteWizard(int wizardID){
+    public void deleteWizard(int wizardID) {
         try {
             LOGGER.info("Deleting wizard with ID: " + wizardID + " from repository.");
             repository.findById(wizardID).orElseThrow(

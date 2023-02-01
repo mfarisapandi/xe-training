@@ -16,13 +16,17 @@ public class OrderService {
 
     private static final Logger LOGGER = Logger.getLogger(OrderService.class.getName());
 
-    @Autowired
-    RestTemplate restTemplate;
+    RestTemplate restTemplate = new RestTemplate();
+
+    public OrderService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
     public String GET_ALL_WIZARD_API = "http://localhost:8090/api/xe/wizardList";
     public String GET_ALL_WAND_API = "http://localhost:8070/api/xe/magicWandList";
     public String GET_WAND_UPDATE_API = "http://localhost:8070/api/xe/update";
     @Autowired
-    private OrderRepository orderRepository;
+    OrderRepository orderRepository;
 
     public String getList() {
         try {
@@ -48,63 +52,69 @@ public class OrderService {
     }
 
     public String addOrder(Order order) {
-        try {
 
-            ResponseEntity<List<WizardPojo>> responseWizard = restTemplate.exchange(GET_ALL_WIZARD_API, HttpMethod.GET,
-                    null, new ParameterizedTypeReference<List<WizardPojo>>() {
-                    });
+        ResponseEntity<List<WizardPojo>> responseWizard = restTemplate.exchange(GET_ALL_WIZARD_API, HttpMethod.GET,
+                null, new ParameterizedTypeReference<>() {
+                });
 
-            ResponseEntity<List<MagicWandPojo>> responseMagicWand = restTemplate.exchange(GET_ALL_WAND_API, HttpMethod.GET,
-                    null, new ParameterizedTypeReference<List<MagicWandPojo>>() {
-                    });
+        ResponseEntity<List<MagicWandPojo>> responseMagicWand = restTemplate.exchange(GET_ALL_WAND_API, HttpMethod.GET,
+                null, new ParameterizedTypeReference<>() {
+                });
 
-            LOGGER.info("Adding order to repository.");
+        LOGGER.info("Adding order to repository.");
 
-            for (WizardPojo wizardPojo : responseWizard.getBody()) {
-                if (wizardPojo.getWizard_id() == order.getWizardID()) {
-                    if (wizardPojo.getIs_active().equals("N")) {
-                        return wizardPojo.getWizard_name() + "status currently not active";
-                    }
-                    order.setWizardName(wizardPojo.getWizard_name());
-                    order.setAgeLimit(wizardPojo.getWizard_age());
+        for (WizardPojo wizardPojo : responseWizard.getBody()) {
+            LOGGER.info(String.valueOf(order.getWizardID()));
+            LOGGER.info(String.valueOf(wizardPojo.getWizardID()));
+            if (wizardPojo.getWizardID() == order.getWizardID()) {
+                if (wizardPojo.getIsActive().equals("Y")) {
+                    order.setWizardID(wizardPojo.getWizardID());
+                    order.setWizardName(wizardPojo.getWizardName());
+                    order.setWizardAge(wizardPojo.getWizardAge());
+                    order.setJoinedDate(wizardPojo.getJoinedDate());
 
                     for (MagicWandPojo magicWandPojo : responseMagicWand.getBody()) {
-                        if (magicWandPojo.getMagic_wand_id() == order.getMagicWandID()) {
-                            if (order.getWizardAge() > magicWandPojo.getAge_limit()) {
-                                return wizardPojo.getWizard_name() + "age is: " + order.getWizardAge() + ". The age is exceeds " +
-                                        magicWandPojo.getMagic_wand_name() + " limit age which is " + magicWandPojo.getAge_limit();
+                        if (magicWandPojo.getMagicWandID() == order.getMagicWandID()) {
+                            if (order.getWizardAge() < magicWandPojo.getAgeLimit()) {
+                                if (magicWandPojo.getWandStock() > 0) {
+                                    order.setMagicWandID(magicWandPojo.getMagicWandID());
+                                    order.setMagicWandName(magicWandPojo.getMagicWandName());
+                                    order.setMagicWandDesc(magicWandPojo.getMagicWandDesc());
+
+                                    magicWandPojo.setWandStock(magicWandPojo.getWandStock() - 1);
+
+                                    orderRepository.save(order);
+
+                                } else {
+                                    return "Magic Wand ID: " + magicWandPojo.getMagicWandID() + "\nName: " + magicWandPojo.getMagicWandName() +
+                                            "\nis out of stock";
+                                }
+                            } else {
+                                return order.getWizardName() + " age is: " + order.getWizardAge() + ". The age is exceeds the age limit." +
+                                        "\nAge limit: " + magicWandPojo.getAgeLimit();
                             }
-                            if (magicWandPojo.getStock() <= 0) {
-                                return magicWandPojo.getStock() + " is out of stock";
-                            }
-                            order.setMagicWandName(magicWandPojo.getMagic_wand_name());
-                            order.setMagicWandDesc((magicWandPojo.getMagic_wand_desc()));
-
-                            order.setStock(magicWandPojo.getStock() - 1);
-                            order.setAgeLimit(magicWandPojo.getAge_limit());
-
-                            magicWandPojo.setStock(order.getStock());
-
-                            HttpEntity<MagicWandPojo> request = new HttpEntity<>(magicWandPojo);
-                            ResponseEntity<String> responseUpdate = restTemplate.exchange(GET_WAND_UPDATE_API + "/" +
-                                    order.getMagicWandID(), HttpMethod.PUT, request, String.class);
-
-                            orderRepository.save(order);
-                            return "Order created successfully";
+                        } else {
+                            LOGGER.info(String.valueOf(order.getWizardID()));
+                            LOGGER.info(String.valueOf(wizardPojo.getWizardID()));
+                            LOGGER.info(String.valueOf(order.getMagicWandID()));
+                            LOGGER.info(String.valueOf(magicWandPojo.getMagicWandID()));
+                            return "Invalid Magic Wand ID";
                         }
                     }
-
-                    return "Invalid Magic Wand ID";
+                } else {
+                    return "Wizard with ID: " + wizardPojo.getWizardID() + " is not active";
                 }
+            } else {
+                LOGGER.info(String.valueOf(order.getWizardID()));
+                LOGGER.info(String.valueOf(wizardPojo.getWizardID()));
+                LOGGER.info(String.valueOf(order.getMagicWandID()));
+                return "Invalid Wizard ID";
             }
-
-            return "Invalid Wizard ID ";
-
-        } catch (RestClientException e) {
-            LOGGER.log(Level.SEVERE, "Error adding order.", e);
-            return "Error";
         }
+
+        return "Order created";
     }
+
     public Order updateOrder(Order order) {
         LOGGER.info("Updating order in repository.");
         return orderRepository.save(order);

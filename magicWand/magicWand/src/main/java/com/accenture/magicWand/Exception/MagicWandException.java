@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class MagicWandException extends RuntimeException{
 
     public static final String ID_DOES_NOT_EXIST =
-            "Wizard does not exist";
+            "Magic Wand does not exist";
 
     public MagicWandException(String message) {
         super(message);
