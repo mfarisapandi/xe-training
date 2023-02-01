@@ -1,41 +1,42 @@
 package com.accenture.order.Entity;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.*;
 
 @Entity
-@Table(name = "order")
+@Table(name = "order_service")
 @Data
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
+    @JsonProperty("order_id")
     private int orderID;
-    @Column(name = "order_date")
+    @JsonProperty("order_date")
     private LocalDate orderDate;
-    @Column(name = "wizard_id")
+    @JsonProperty("wizard_id")
     private int wizardID;
-    @Column(name = "wizard_name")
+    @JsonProperty("wizard_name")
     private String wizardName;
-    @Column(name = "wizard_age")
+    @JsonProperty("wizard_age")
     private int wizardAge;
-    @Column(name = "joined_date")
+    @JsonProperty("joined_date")
     private LocalDate joinedDate;
-    @Column(name = "is_active")
+    @JsonProperty("is_active")
     private String isActive;
-    @Column(name = "magic_wand_id")
+    @JsonProperty("magic_wand_id")
     private int magicWandID;
-    @Column(name = "magic_wand_name")
+    @JsonProperty("magic_wand_name")
     private String magicWandName;
-    @Column(name = "magic_wand_desc")
+    @JsonProperty("magic_wand_desc")
     private String magicWandDesc;
-    @Column(name = "age_limit")
+    @JsonProperty("age_limit")
     private int ageLimit;
-    @Column(name = "stock")
-    private int stock;
+    @JsonProperty("wand_stock")
+    private int wandStock;
 
     public Order() {
     }
@@ -45,7 +46,7 @@ public class Order {
                  int wizardAge, LocalDate joinedDate,
                  String isActive, int magicWandID,
                  String magicWandName, String magicWandDesc,
-                 int ageLimit, int stock) {
+                 int ageLimit, int wandStock) {
         this.orderID = orderID;
         this.orderDate = orderDate;
         this.wizardID = wizardID;
@@ -57,7 +58,7 @@ public class Order {
         this.magicWandName = magicWandName;
         this.magicWandDesc = magicWandDesc;
         this.ageLimit = ageLimit;
-        this.stock = stock;
+        this.wandStock = wandStock;
     }
 
     public int getOrderID() {
@@ -148,11 +149,11 @@ public class Order {
         this.ageLimit = ageLimit;
     }
 
-    public int getStock() {
-        return stock;
+    public int getWandStock() {
+        return wandStock;
     }
 
-    public void setStock(int stock) {
-        this.stock = stock;
+    public void setWandStock(int wandStock) {
+        this.wandStock = wandStock;
     }
 }
