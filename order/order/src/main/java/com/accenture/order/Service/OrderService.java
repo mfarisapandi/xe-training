@@ -1,6 +1,7 @@
 package com.accenture.order.Service;
 
 import com.accenture.order.Entity.*;
+import com.accenture.order.Exception.*;
 import com.accenture.order.Repository.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.core.*;
@@ -14,9 +15,9 @@ import java.util.logging.*;
 @Service
 public class OrderService {
 
-    private static final Logger LOGGER = Logger.getLogger(OrderService.class.getName());
+    private static final Logger log = Logger.getLogger(OrderService.class.getName());
 
-    RestTemplate restTemplate = new RestTemplate();
+    RestTemplate restTemplate;
 
     public OrderService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -33,20 +34,20 @@ public class OrderService {
             String responseFromWizard = restTemplate.getForObject(GET_ALL_WIZARD_API, String.class);
             String responseFromWand = restTemplate.getForObject(GET_ALL_WAND_API, String.class);
 
-            LOGGER.info("Successfully retrieved wizard and wand lists.");
+            log.info("Successfully retrieved wizard and wand lists.");
             return ("Wizards list = " + responseFromWizard + "\nMagic Wands List = " + responseFromWand);
 
         } catch (RestClientException e) {
-            LOGGER.log(Level.SEVERE, "Error retrieving wizard and wand lists.", e);
+            log.log(Level.SEVERE, "Error retrieving wizard and wand lists.", e);
             return "Error";
         }
     }
 
     public List<Order> getOrder() {
-        LOGGER.info("Retrieving all orders from repository.");
+        log.info("Retrieving all orders from repository.");
         List<Order> orders = orderRepository.findAll();
         if (orders.isEmpty()) {
-            LOGGER.severe("No orders found");
+            log.severe("No orders found");
         }
         return orders;
     }
@@ -61,11 +62,13 @@ public class OrderService {
                 null, new ParameterizedTypeReference<>() {
                 });
 
-        LOGGER.info("Adding order to repository.");
+        log.info("Adding order to repository.");
 
         for (WizardPojo wizardPojo : responseWizard.getBody()) {
-            LOGGER.info(String.valueOf(order.getWizardID()));
-            LOGGER.info(String.valueOf(wizardPojo.getWizardID()));
+
+            log.info(String.valueOf(order.getWizardID()));
+            log.info(String.valueOf(wizardPojo.getWizardID()));
+
             if (wizardPojo.getWizardID() == order.getWizardID()) {
                 if (wizardPojo.getIsActive().equals("Y")) {
                     order.setWizardID(wizardPojo.getWizardID());
@@ -83,45 +86,50 @@ public class OrderService {
 
                                     magicWandPojo.setWandStock(magicWandPojo.getWandStock() - 1);
 
+                                    HttpHeaders headers = new HttpHeaders();
+                                    headers.setContentType(MediaType.APPLICATION_JSON);
+                                    HttpEntity<MagicWandPojo> request = new HttpEntity<>(magicWandPojo, headers);
+
+                                    restTemplate.exchange(GET_WAND_UPDATE_API, HttpMethod.PUT, request, MagicWandPojo.class);
+
+
                                     orderRepository.save(order);
-
-                                } else {
-                                    return "Magic Wand ID: " + magicWandPojo.getMagicWandID() + "\nName: " + magicWandPojo.getMagicWandName() +
-                                            "\nis out of stock";
+                                    log.info("Order created");
+                                    return "Order created";
                                 }
-                            } else {
-                                return order.getWizardName() + " age is: " + order.getWizardAge() + ". The age is exceeds the age limit." +
-                                        "\nAge limit: " + magicWandPojo.getAgeLimit();
+                                log.info("Magic Wand ID: " + magicWandPojo.getMagicWandID() + "\nName: " + magicWandPojo.getMagicWandName() +
+                                        "\nis out of stock");
+
                             }
-                        } else {
-                            LOGGER.info(String.valueOf(order.getWizardID()));
-                            LOGGER.info(String.valueOf(wizardPojo.getWizardID()));
-                            LOGGER.info(String.valueOf(order.getMagicWandID()));
-                            LOGGER.info(String.valueOf(magicWandPojo.getMagicWandID()));
-                            return "Invalid Magic Wand ID";
+                            log.info(order.getWizardName() + " age is: " + order.getWizardAge() + ". The age is exceeds the age limit." +
+                                    "\nAge limit: " + magicWandPojo.getAgeLimit());
                         }
+                        log.info("Invalid Magic Wand ID");
                     }
-                } else {
-                    return "Wizard with ID: " + wizardPojo.getWizardID() + " is not active";
                 }
-            } else {
-                LOGGER.info(String.valueOf(order.getWizardID()));
-                LOGGER.info(String.valueOf(wizardPojo.getWizardID()));
-                LOGGER.info(String.valueOf(order.getMagicWandID()));
-                return "Invalid Wizard ID";
+                log.info("Wizard with ID: " + wizardPojo.getWizardID() + " is not active");
             }
+            log.info("Invalid Wizard ID");
         }
-
-        return "Order created";
+        log.info("Order not created : invalid input");
+        return "Order not created : invalid input";
     }
 
-    public Order updateOrder(Order order) {
-        LOGGER.info("Updating order in repository.");
-        return orderRepository.save(order);
-    }
+//    public Order updateOrder(Order order) {
+//        LOGGER.info("Updating order in repository.");
+//        return orderRepository.save(order);
+//    }
+//
+//
 
     public void deleteOrder(int orderID) {
-        LOGGER.info("Deleting order with ID: " + orderID + " from repository.");
+        log.info("Deleting Order with ID: " + orderID + " from repository.");
+        orderRepository.findById(orderID).orElseThrow(
+                () -> {
+                    log.severe("Error deleting Order with ID " + orderID + ": " + "Does not exist");
+                    return new OrderException(OrderException.ID_DOES_NOT_EXIST);
+                }
+        );
         orderRepository.deleteById(orderID);
     }
 }

@@ -14,13 +14,14 @@ public class OrderController {
 
     @Autowired
     OrderService service;
-    @Autowired
-    private OrderRepository orderRepository;
 
-    @GetMapping("")
-    public String intro(){
-        return "Welcome!";
-    }
+    @Autowired
+    OrderRepository orderRepository;
+
+//    @GetMapping("")
+//    public String intro(){
+//        return "Welcome!";
+//    }
 
     @GetMapping("allList")
     public String allList(){
@@ -37,10 +38,12 @@ public class OrderController {
         return service.addOrder(order);
     }
 
-    @PutMapping("update")
-    public Order updateOrder(@RequestBody Order order){
-        return service.updateOrder(order);
-    }
+//    @PutMapping("update")
+//    public Order updateOrder(@RequestBody Order order){
+//        return service.updateOrder(order);
+//    }
+//
+//
 
     @DeleteMapping("delete/{orderID}")
     public String deleteOrder(@PathVariable(value = "orderID") int orderID){
