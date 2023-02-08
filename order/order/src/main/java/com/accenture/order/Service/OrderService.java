@@ -126,7 +126,13 @@ public class OrderService {
     }
 
     public Order updateOrder(Order order) {
-        log.info("Updating order in repository.");
+        log.info("Updating Order in repository.");
+        orderRepository.findById(order.getOrderID()).orElseThrow(
+                () -> {
+                    log.severe("Order with ID " + order.getOrderID() + " does not exist");
+                    return new OrderException(OrderException.ID_DOES_NOT_EXIST);
+                }
+        );
         return orderRepository.save(order);
     }
 
