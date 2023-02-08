@@ -18,35 +18,34 @@ public class OrderController {
     @Autowired
     OrderRepository orderRepository;
 
-//    @GetMapping("")
-//    public String intro(){
-//        return "Welcome!";
-//    }
+    @GetMapping("")
+    public String intro() {
+        return "Welcome!";
+    }
 
     @GetMapping("allList")
-    public String allList(){
+    public String allList() {
         return service.getList();
     }
 
     @GetMapping("getOrder")
-    public List<Order> getOrder(){
+    public List<Order> getOrder() {
         return service.getOrder();
     }
 
     @PostMapping("add")
-    public String addOrder(@RequestBody Order order){
+    public String addOrder(@RequestBody Order order) {
         return service.addOrder(order);
     }
 
-//    @PutMapping("update")
-//    public Order updateOrder(@RequestBody Order order){
-//        return service.updateOrder(order);
-//    }
-//
-//
+    @PutMapping("update")
+    public Order updateOrder(@RequestBody Order order) {
+        return service.updateOrder(order);
+    }
+
 
     @DeleteMapping("delete/{orderID}")
-    public String deleteOrder(@PathVariable(value = "orderID") int orderID){
+    public String deleteOrder(@PathVariable(value = "orderID") int orderID) {
         service.deleteOrder(orderID);
         return ("Order with ID " + orderID + " is deleted");
     }

@@ -77,6 +77,10 @@ public class OrderService {
                     order.setJoinedDate(wizardPojo.getJoinedDate());
 
                     for (MagicWandPojo magicWandPojo : responseMagicWand.getBody()) {
+
+                        log.info(String.valueOf(order.getMagicWandID()));
+                        log.info(String.valueOf(magicWandPojo.getMagicWandID()));
+
                         if (magicWandPojo.getMagicWandID() == order.getMagicWandID()) {
                             if (order.getWizardAge() < magicWandPojo.getAgeLimit()) {
                                 if (magicWandPojo.getWandStock() > 0) {
@@ -99,28 +103,32 @@ public class OrderService {
                                 }
                                 log.info("Magic Wand ID: " + magicWandPojo.getMagicWandID() + "\nName: " + magicWandPojo.getMagicWandName() +
                                         "\nis out of stock");
+                                return "Magic Wand ID: " + magicWandPojo.getMagicWandID() + "\nName: " + magicWandPojo.getMagicWandName() +
+                                        "\nis out of stock";
 
                             }
                             log.info(order.getWizardName() + " age is: " + order.getWizardAge() + ". The age is exceeds the age limit." +
                                     "\nAge limit: " + magicWandPojo.getAgeLimit());
+                            return order.getWizardName() + " age is: " + order.getWizardAge() + ". The age is exceeds the age limit." +
+                                    "\nAge limit: " + magicWandPojo.getAgeLimit();
                         }
-                        log.info("Invalid Magic Wand ID");
+
                     }
+                    log.info("Invalid Magic Wand ID");
+                    return "Invalid Magic Wand ID";
                 }
                 log.info("Wizard with ID: " + wizardPojo.getWizardID() + " is not active");
+                return "Wizard with ID: " + wizardPojo.getWizardID() + " is not active";
             }
-            log.info("Invalid Wizard ID");
         }
-        log.info("Order not created : invalid input");
-        return "Order not created : invalid input";
+        log.info("Invalid Wizard ID");
+        return "Invalid Wizard ID";
     }
 
-//    public Order updateOrder(Order order) {
-//        LOGGER.info("Updating order in repository.");
-//        return orderRepository.save(order);
-//    }
-//
-//
+    public Order updateOrder(Order order) {
+        log.info("Updating order in repository.");
+        return orderRepository.save(order);
+    }
 
     public void deleteOrder(int orderID) {
         log.info("Deleting Order with ID: " + orderID + " from repository.");
